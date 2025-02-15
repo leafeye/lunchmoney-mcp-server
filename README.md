@@ -1,14 +1,15 @@
 # Lunchmoney MCP Server
 
-A Model Context Protocol (MCP) server that lets you interact with your [Lunchmoney](https://lunchmoney.app) transactions through Claude and other AI assistants.
+A Model Context Protocol (MCP) server that lets you interact with your [Lunchmoney](https://lunchmoney.app) transactions and budgets through Claude and other AI assistants.
 
 ## Features
 
-This server provides three main tools:
+This server provides four main tools:
 
 1. **get-recent-transactions**: View your recent transactions from the past N days
 2. **search-transactions**: Search transactions by keyword in payee names or notes
 3. **get-category-spending**: Analyze spending in specific categories
+4. **get-budget-summary**: Get detailed budget information including spending, remaining amounts, and recurring items
 
 ## Installation
 
@@ -34,9 +35,19 @@ Replace `your_token_here` with your Lunchmoney API token, which you can get from
 
 Once configured in Claude Desktop, you can ask questions like:
 
+### Transactions
 - "Show me my recent transactions from the past week"
 - "Search for all transactions at Amazon"
 - "How much did I spend on restaurants last month?"
+- "Find transactions tagged as business expenses"
+
+### Budgets
+- "Show me my budget summary for this month"
+- "What's my budget status from January to March 2024?"
+- "How much of my food budget is remaining?"
+- "Show me categories where I'm over budget"
+
+
 
 ## What is MCP?
 
@@ -67,6 +78,18 @@ npm run build
 ```bash
 LUNCHMONEY_TOKEN=your_token_here node build/index.js
 ```
+
+5. Test with MCP Inspector:
+```bash
+LUNCHMONEY_TOKEN=your_token_here npx @modelcontextprotocol/inspector node build/index.js
+```
+
+## API Notes
+
+- Budget data must use month boundaries for dates (e.g., 2024-01-01 to 2024-01-31)
+- Transactions can use any date range
+- All monetary values are returned in their original currency
+- Category names are case-insensitive when searching
 
 ## License
 
