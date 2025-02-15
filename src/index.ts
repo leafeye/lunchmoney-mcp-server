@@ -5,6 +5,29 @@ import fetch from "node-fetch";
 
 const API_BASE = "https://dev.lunchmoney.app/v1";
 
+interface Tag {
+    id: number;
+    name: string;
+}
+
+interface Transaction {
+    id: number;
+    date: string;
+    amount: string;
+    currency: string;
+    payee: string;
+    category_name: string;
+    category_group_name: string;
+    account_display_name?: string;
+    status: string;
+    notes?: string;
+    tags?: Tag[];
+}
+
+interface TransactionResponse {
+    transactions: Transaction[];
+}
+
 class LunchmoneyServer {
     private server: McpServer;
     private token: string;
@@ -72,7 +95,7 @@ class LunchmoneyServer {
                 });
 
                 const matchingTransactions = transactions.filter(
-                    tx =>
+                    (tx: Transaction) =>
                         tx.payee.toLowerCase().includes(keyword.toLowerCase()) ||
                         (tx.notes && tx.notes.toLowerCase().includes(keyword.toLowerCase())),
                 );
@@ -108,14 +131,14 @@ class LunchmoneyServer {
                 });
 
                 const matchingTransactions = transactions.filter(
-                    tx => tx.category_name.toLowerCase() === category.toLowerCase(),
+                    (tx: Transaction) => tx.category_name.toLowerCase() === category.toLowerCase(),
                 );
 
-                const totals = matchingTransactions.reduce((acc, tx) => {
+                const totals = matchingTransactions.reduce((acc: Record<string, number>, tx: Transaction) => {
                     const currency = tx.currency.toUpperCase();
                     acc[currency] = (acc[currency] || 0) + Number(tx.amount);
                     return acc;
-                }, {} as Record<string, number>);
+                }, {});
 
                 let summary = `Spending in '${category}' over the past ${days} days:\n\n`;
                 Object.entries(totals).forEach(([currency, total]) => {
@@ -139,7 +162,7 @@ class LunchmoneyServer {
         );
     }
 
-    private async fetchTransactions(params: Record<string, any>) {
+    private async fetchTransactions(params: Record<string, any>): Promise<Transaction[]> {
         const response = await fetch(`${API_BASE}/transactions`, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
@@ -151,11 +174,11 @@ class LunchmoneyServer {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.json() as TransactionResponse;
         return data.transactions || [];
     }
 
-    private formatTransactions(transactions: any[]) {
+    private formatTransactions(transactions: Transaction[]): string {
         return transactions
             .map(tx => {
                 let summary = [
@@ -167,8 +190,8 @@ class LunchmoneyServer {
                     `Status: ${tx.status}`,
                 ];
 
-                if (tx.tags?.length > 0) {
-                    summary.push(`Tags: ${tx.tags.map((t: any) => t.name).join(", ")}`);
+                if (tx.tags && tx.tags.length > 0) {
+                    summary.push(`Tags: ${tx.tags.map((t: Tag) => t.name).join(", ")}`);
                 }
 
                 if (tx.notes) {
