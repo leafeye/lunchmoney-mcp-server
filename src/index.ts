@@ -28,6 +28,60 @@ interface TransactionResponse {
     transactions: Transaction[];
 }
 
+
+interface BudgetData {
+    num_transactions?: number;
+    spending_to_base?: number;
+    budget_to_base?: number;
+    budget_amount?: number;
+    budget_currency?: string;
+    is_automated?: boolean;
+}
+
+interface BudgetConfig {
+    config_id: number;
+    cadence: string;
+    amount: number;
+    currency: string;
+    to_base: number;
+    auto_suggest: string;
+}
+
+interface RecurringItem {
+    payee: string;
+    amount: string;
+    currency: string;
+    to_base: number;
+}
+
+interface Recurring {
+    list: RecurringItem[];
+}
+
+interface Budget {
+    category_name: string;
+    category_id: number;
+    category_group_name: string | null;
+    group_id: number | null;
+    is_group: boolean | null;
+    is_income: boolean;
+    exclude_from_budget: boolean;
+    exclude_from_totals: boolean;
+    data: Record<string, BudgetData>;
+    config: BudgetConfig | null;
+    order: number;
+    archived: boolean;
+    recurring: Recurring | null;
+}
+
+interface BudgetParams {
+    start_date: string;
+    end_date: string;
+}
+
+
+////////////////////////////////////////////////////////////////
+
 class LunchmoneyServer {
     private server: McpServer;
     private token: string;
@@ -44,6 +98,49 @@ class LunchmoneyServer {
     }
 
     private registerTools() {
+        this.server.tool(
+            "get-budget-summary",
+            "Get budget summary for a specific time period",
+            {
+                start_date: z.string().describe("Start date (YYYY-MM-DD, should be start of month)"),
+                end_date: z.string().describe("End date (YYYY-MM-DD, should be end of month)"),
+            },
+            async ({ start_date, end_date }) => {
+                try {
+                    const budgets = await this.fetchBudgets(start_date, end_date);
+                    
+                    if (!budgets.length) {
+                        return {
+                            content: [
+                                {
+                                    type: "text",
+                                    text: "No budget data found for the specified period.",
+                                },
+                            ],
+                        };
+                    }
+
+                    return {
+                        content: [
+                            {
+                                type: "text",
+                                text: this.formatBudgetSummary(budgets),
+                            },
+                        ],
+                    };
+                } catch (error) {
+                    return {
+                        content: [
+                            {
+                                type: "text",
+                                text: `Error fetching budget data: ${error}`,
+                            },
+                        ],
+                    };
+                }
+            }
+        );
+
         this.server.tool(
             "get-recent-transactions",
             "Get recent transactions",
@@ -162,12 +259,70 @@ class LunchmoneyServer {
         );
     }
 
-    private async fetchTransactions(params: Record<string, any>): Promise<Transaction[]> {
-        const response = await fetch(`${API_BASE}/transactions`, {
+    private async fetchBudgets(start_date: string, end_date: string): Promise<Budget[]> {
+        const response = await fetch(`${API_BASE}/budgets?start_date=${start_date}&end_date=${end_date}`, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
                 Accept: "application/json",
-            },
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json() as Budget[];
+    }
+
+    private formatBudgetSummary(budgets: Budget[]): string {
+        let summary: string[] = [];
+
+        for (const budget of budgets) {
+            const categoryHeader = `Category: ${budget.category_name}${budget.category_group_name ? ` (${budget.category_group_name})` : ''}`;
+            let budgetInfo: string[] = [categoryHeader];
+
+            // Add monthly data
+            Object.entries(budget.data).forEach(([date, data]) => {
+                const monthData = [
+                    `\nMonth: ${date}`,
+                    `Transactions: ${data.num_transactions || 0}`,
+                    `Spending: ${data.spending_to_base?.toFixed(2) || '0.00'} ${data.budget_currency?.toUpperCase() || 'USD'}`,
+                ];
+
+                if (data.budget_amount) {
+                    monthData.push(`Budget: ${data.budget_amount.toFixed(2)} ${data.budget_currency?.toUpperCase() || 'USD'}`);
+                    const remainingBudget = (data.budget_amount - (data.spending_to_base || 0)).toFixed(2);
+                    monthData.push(`Remaining: ${remainingBudget} ${data.budget_currency?.toUpperCase() || 'USD'}`);
+                }
+
+                budgetInfo.push(monthData.join('\n'));
+            });
+
+            // Add recurring items if any
+            if (budget.recurring && budget.recurring.list && budget.recurring.list.length > 0) {
+                budgetInfo.push('\nRecurring Items:');
+                budget.recurring.list.forEach(item => {
+                    budgetInfo.push(`- ${item.payee}: ${item.amount} ${item.currency.toUpperCase()}`);
+                });
+            }
+
+            summary.push(budgetInfo.join('\n'));
+        }
+
+        return summary.join('\n\n---\n\n');
+    }
+
+    private async fetchTransactions(params: Record<string, any>): Promise<Transaction[]> {
+        const queryParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(params)) {
+            queryParams.append(key, value.toString());
+        }
+
+        const response = await fetch(`${API_BASE}/transactions?${queryParams}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+                Accept: "application/json",
+            }
         });
 
         if (!response.ok) {
