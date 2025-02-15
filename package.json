@@ -19,5 +19,9 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
-  }
+  },
+  "repository": {
+    "url": "https://.com/leafeye/lunchmoney-mcp-server.git"
+  },
+  "homepage": "https://github.com/leafeye/lunchmoney-mcp-server#readme"
 }
