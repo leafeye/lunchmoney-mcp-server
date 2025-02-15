@@ -1,5 +1,7 @@
 # Lunchmoney MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@leafeye/lunchmoney-mcp-server)](https://smithery.ai/server/@leafeye/lunchmoney-mcp-server)
+
 A Model Context Protocol (MCP) server that lets you interact with your [Lunchmoney](https://lunchmoney.app) transactions and budgets through Claude and other AI assistants.
 
 ## Features
@@ -12,6 +14,14 @@ This server provides four main tools:
 4. **get-budget-summary**: Get detailed budget information including spending, remaining amounts, and recurring items
 
 ## Installation
+
+### Installing via Smithery
+
+To install Lunchmoney MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@leafeye/lunchmoney-mcp-server):
+
+```bash
+npx -y @smithery/cli install @leafeye/lunchmoney-mcp-server --client claude
+```
 
 You can use this server directly in Claude Desktop without installation:
 
