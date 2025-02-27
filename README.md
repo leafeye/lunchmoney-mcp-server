@@ -4,6 +4,8 @@
 
 A Model Context Protocol (MCP) server that lets you interact with your [Lunchmoney](https://lunchmoney.app) transactions and budgets through Claude and other AI assistants.
 
+<a href="https://glama.ai/mcp/servers/3t8spwi9q7"><img width="380" height="200" src="https://glama.ai/mcp/servers/3t8spwi9q7/badge" alt="lunchmoney-mcp MCP server" /></a>
+
 ## Features
 
 This server provides four main tools:
