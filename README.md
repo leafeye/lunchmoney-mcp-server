@@ -32,11 +32,11 @@ This server provides four main tools:
 
 You can find more about MCP in the documentaion: https://modelcontextprotocol.io/introduction
 
-## Installation Options
+## Installation 
 
 Also look at the offical Claude documentation: https://modelcontextprotocol.io/quickstart/user
 
-### Option 1: Using npx (Easiest, No Programming Experience Required)
+### Using npx
 
 Node.js is a software platform that lets you run JavaScript code on your computer (outside of a web browser).
 
@@ -103,7 +103,6 @@ Some key benefits of MCP:
 - Make sure the configuration in Claude's Developer settings is correct
 - Try restarting Claude Desktop after changing the configuration
 - Check that your Lunchmoney API token is valid
-- Ensure that the path to the script is correct if using Option 2
 
 **Claude doesn't recognize Lunchmoney commands:**
 - Start a new conversation in Claude
@@ -114,7 +113,6 @@ Some key benefits of MCP:
 - Budget data must use month boundaries for dates (e.g., 2024-01-01 to 2024-01-31)
 - Transactions can use any date range
 - All monetary values are returned in their original currency
-- Category names are case-insensitive when searching
 
 ## License
 
