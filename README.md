@@ -1,7 +1,10 @@
 # Lunchmoney MCP Server
 
-
 A Model Context Protocol (MCP) server that lets you interact with your [Lunchmoney](https://lunchmoney.app) transactions and budgets through Claude and other AI assistants.
+
+## What is this?
+
+This tool allows you to connect your Lunchmoney financial data to Claude AI, so you can ask questions about your spending, analyze your budget, and get insights about your finances through a natural conversation.
 
 ## Features
 
@@ -12,9 +15,42 @@ This server provides four main tools:
 3. **get-category-spending**: Analyze spending in specific categories
 4. **get-budget-summary**: Get detailed budget information including spending, remaining amounts, and recurring items
 
-## Installation
+## Privacy and Data Handling
 
-You can use this server directly in Claude Desktop without installation:
+**Important:** MCP provides a structured way for Claude to interact with your Lunchmoney data while maintaining privacy boundaries. Here's what you should know:
+
+- Claude (the host) creates a client that connects to your local MCP server
+- Your Lunchmoney API token stays on your local machine
+- The MCP server runs locally and fetches data from Lunchmoney's API
+- You will be asked to approve each request to access your Lunchmoney data
+- When you ask a question about your finances, Claude requests specific information from the MCP server
+- The MCP server processes your request locally and returns only the relevant results
+- Claude never has direct access to your full financial data or API token
+- Only the specific information requested (like transaction summaries or budget status) is shared with Claude
+- Anthropic's data retention policies apply to these summary results that are part of your conversation
+- Each server connection is isolated, maintaining clear security boundaries
+
+You can find more about MCP in the documentaion: https://modelcontextprotocol.io/introduction
+
+## Installation Options
+
+Also look at the offical Claude documentation: https://modelcontextprotocol.io/quickstart/user
+
+### Option 1: Using npx (Easiest, No Programming Experience Required)
+
+Node.js is a software platform that lets you run JavaScript code on your computer (outside of a web browser).
+
+To install Node.js:
+- **Windows/Mac**: Download and run the installer from the [official Node.js website](https://nodejs.org/)
+- **Mac with Homebrew**: Run `brew install node` in Terminal
+- **Linux**: Use your package manager (e.g., `sudo apt install nodejs` for Ubuntu)
+
+Once Node.js is installed on your computer, you can run the server directly without downloading anything:
+
+1. Get your Lunchmoney API token from your [Lunchmoney developer settings](https://my.lunchmoney.app/developers)
+2. Open Claude Desktop
+3. Go to Settings → Developer -> `Edit Config`
+4. Add the following configuration:
 
 ```json
 {
@@ -30,7 +66,10 @@ You can use this server directly in Claude Desktop without installation:
 }
 ```
 
-Replace `your_token_here` with your Lunchmoney API token, which you can get from your [Lunchmoney developer settings](https://my.lunchmoney.app/developers).
+Replace `your_token_here` with your actual Lunchmoney API token.
+
+**Important Note:** After changing the configuration, you may need to restart Claude Desktop for the changes to take effect.
+
 
 ## Example Usage
 
@@ -48,8 +87,6 @@ Once configured in Claude Desktop, you can ask questions like:
 - "How much of my food budget is remaining?"
 - "Show me categories where I'm over budget"
 
-
-
 ## What is MCP?
 
 The [Model Context Protocol (MCP)](https://modelcontextprotocol.io) is an open protocol that standardizes how applications provide context to Large Language Models (LLMs). Think of MCP like a USB-C port for AI applications - it provides a standardized way to connect AI models to different data sources and tools.
@@ -60,30 +97,17 @@ Some key benefits of MCP:
 - Growing ecosystem of pre-built integrations
 - Works with multiple AI models and applications
 
-## Development
+## Troubleshooting
 
-To develop locally:
+**Claude says it can't connect to my MCP server:**
+- Make sure the configuration in Claude's Developer settings is correct
+- Try restarting Claude Desktop after changing the configuration
+- Check that your Lunchmoney API token is valid
+- Ensure that the path to the script is correct if using Option 2
 
-1. Clone this repository
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Build the TypeScript code:
-```bash
-npm run build
-```
-
-4. Run with your API token:
-```bash
-LUNCHMONEY_TOKEN=your_token_here node build/index.js
-```
-
-5. Test with MCP Inspector:
-```bash
-LUNCHMONEY_TOKEN=your_token_here npx @modelcontextprotocol/inspector node build/index.js
-```
+**Claude doesn't recognize Lunchmoney commands:**
+- Start a new conversation in Claude
+- Try explicitly mentioning Lunchmoney in your query (e.g., "Show me my recent Lunchmoney transactions")
 
 ## API Notes
 
