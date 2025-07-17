@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/leafeye-lunchmoney-mcp-server-badge.png)](https://mseep.ai/app/leafeye-lunchmoney-mcp-server)
+
 # Lunchmoney MCP Server
 
 A Model Context Protocol (MCP) server that lets you interact with your [Lunchmoney](https://lunchmoney.app) transactions and budgets through Claude and other AI assistants.
